@@ -5,7 +5,7 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.NODE_ENV === "production" 
-      ? `${process.env.DATABASE_URL}?ssl=true&sslmode=require&sslcert=disable`
+      ? `${process.env.DATABASE_URL}?sslmode=disable`
       : process.env.DATABASE_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
