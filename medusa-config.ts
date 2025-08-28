@@ -5,11 +5,13 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.NODE_ENV === "production" 
-      ? `${process.env.DATABASE_URL}?ssl=1&sslmode=require&sslcert=&sslkey=&sslrootcert=` 
-      : process.env.DATABASE_URL,
-    databaseDriverOptions: {
-      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false, requestCert: false } : false,
-    },
+      ? `${process.env.DATABASE_URL}?sslmode=require`
+      : process.env.DATABASE_URL || "postgresql://localhost/gottofrotto_dev",
+    databaseDriverOptions: process.env.NODE_ENV === "production" ? {
+      connection: {
+        ssl: { rejectUnauthorized: false }
+      }
+    } : {},
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -19,7 +21,8 @@ module.exports = defineConfig({
     }
   },
   modules: [
-    {
+    // Only add PostHog analytics in production when API key is set
+    ...(process.env.POSTHOG_EVENTS_API_KEY ? [{
       resolve: "@medusajs/medusa/analytics",
       options: {
         providers: [
@@ -33,7 +36,7 @@ module.exports = defineConfig({
           },
         ],
       },
-    },
+    }] : []),
     // Only add DO Spaces in production when environment variables are set
     ...(process.env.DO_SPACES_BUCKET && process.env.DO_SPACES_KEY ? [{
       resolve: "@medusajs/file-s3",
