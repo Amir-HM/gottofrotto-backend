@@ -8,7 +8,9 @@ module.exports = defineConfig({
       ? `${process.env.DATABASE_URL}?sslmode=require`
       : process.env.DATABASE_URL || "postgresql://localhost/gottofrotto_dev",
     databaseDriverOptions: process.env.NODE_ENV === "production" ? {
-      ssl: { rejectUnauthorized: false }
+      connection: {
+        ssl: { rejectUnauthorized: false }
+      }
     } : {},
     http: {
       storeCors: process.env.STORE_CORS!,
