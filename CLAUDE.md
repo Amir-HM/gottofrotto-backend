@@ -31,9 +31,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 3. Use `DATABASE_URL=postgresql://localhost/gottofrotto_dev` in your .env
 4. Run `npm run dev` to start development server
 
-### Production Deployment (DigitalOcean)
+### Production Deployment (Neon Database)
 - The app uses dual SSL configuration: connection string + MikroORM driver options
-- DATABASE_URL must include `?sslmode=require` parameter for DigitalOcean
+- DATABASE_URL must include `?sslmode=require` parameter for Neon
 - MikroORM SSL settings automatically applied in production (NODE_ENV=production)
 - App configured to bind to port 9000 (or PORT environment variable)
 - SSL configuration: connection string parameter + rejectUnauthorized=false in driver

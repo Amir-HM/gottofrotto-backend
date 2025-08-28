@@ -8,10 +8,7 @@ module.exports = defineConfig({
     databaseDriverOptions: {
       connection: {
         ssl: process.env.NODE_ENV === 'production' ? {
-          rejectUnauthorized: false,
-          ca: false,
-          key: false,
-          cert: false
+          rejectUnauthorized: false
         } : false
       }
     },
