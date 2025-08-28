@@ -32,10 +32,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 4. Run `npm run dev` to start development server
 
 ### Production Deployment (DigitalOcean)
-- The app uses MikroORM with specialized SSL configuration for DigitalOcean PostgreSQL
-- SSL settings are automatically applied in production (NODE_ENV=production)
-- Use clean DATABASE_URL format without SSL parameters in environment variables
-- SSL configuration is handled in medusa-config.ts with rejectUnauthorized=false
+- The app uses dual SSL configuration: connection string + MikroORM driver options
+- DATABASE_URL must include `?sslmode=require` parameter for DigitalOcean
+- MikroORM SSL settings automatically applied in production (NODE_ENV=production)
+- App configured to bind to port 9000 (or PORT environment variable)
+- SSL configuration: connection string parameter + rejectUnauthorized=false in driver
 
 ## Architecture Overview
 
