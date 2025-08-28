@@ -20,6 +20,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Generate migrations**: `npx medusa db:generate [module-name]` - Generate migrations for a module
 - **Run migrations**: `npx medusa db:migrate` - Apply database migrations
+- **Create local dev database**: `createdb gottofrotto_dev` - Create PostgreSQL development database
+- **Connect to local dev database**: `psql -d gottofrotto_dev` - Connect to development database
+
+## Environment Setup
+
+### Local Development (Recommended)
+1. Install PostgreSQL locally (already installed via Homebrew)
+2. Create development database: `createdb gottofrotto_dev`  
+3. Use `DATABASE_URL=postgresql://localhost/gottofrotto_dev` in your .env
+4. Run `npm run dev` to start development server
+
+### Production Deployment (DigitalOcean)
+- The app uses MikroORM with specialized SSL configuration for DigitalOcean PostgreSQL
+- SSL settings are automatically applied in production (NODE_ENV=production)
+- Use clean DATABASE_URL format without SSL parameters in environment variables
+- SSL configuration is handled in medusa-config.ts with rejectUnauthorized=false
 
 ## Architecture Overview
 
