@@ -5,11 +5,16 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL || "postgresql://localhost/gottofrotto_dev",
-    databaseDriverOptions: process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost') ? {
-      ssl: { 
-        rejectUnauthorized: false
+    databaseDriverOptions: {
+      connection: {
+        ssl: process.env.NODE_ENV === 'production' ? {
+          rejectUnauthorized: false,
+          ca: false,
+          key: false,
+          cert: false
+        } : false
       }
-    } : {},
+    },
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
