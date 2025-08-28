@@ -35,7 +35,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - The app uses dual SSL configuration: connection string + MikroORM driver options
 - DATABASE_URL must include `?sslmode=require` parameter for Neon
 - MikroORM SSL settings automatically applied in production (NODE_ENV=production)
-- App configured to bind to port 9000 (or PORT environment variable)
+- App automatically binds to PORT environment variable (DigitalOcean sets this)
 - SSL configuration: connection string parameter + rejectUnauthorized=false in driver
 
 ## Architecture Overview
