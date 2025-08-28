@@ -4,10 +4,12 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
   projectConfig: {
-    databaseUrl: process.env.NODE_ENV === "production" 
-      ? `${process.env.DATABASE_URL}?sslmode=require`
-      : process.env.DATABASE_URL || "postgresql://localhost/gottofrotto_dev",
-    databaseDriverOptions: process.env.NODE_ENV === "production" ? {
+    databaseUrl: process.env.DATABASE_URL 
+      ? (process.env.DATABASE_URL.includes('localhost') 
+          ? process.env.DATABASE_URL 
+          : `${process.env.DATABASE_URL}?sslmode=require&ssl=true`)
+      : "postgresql://localhost/gottofrotto_dev",
+    databaseDriverOptions: process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost') ? {
       connection: {
         ssl: { rejectUnauthorized: false }
       }
