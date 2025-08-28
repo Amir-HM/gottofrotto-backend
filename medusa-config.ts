@@ -7,9 +7,9 @@ module.exports = defineConfig({
     databaseUrl: process.env.DATABASE_URL 
       ? (process.env.DATABASE_URL.includes('localhost') 
           ? process.env.DATABASE_URL 
-          : process.env.DATABASE_URL.includes('?') 
-            ? process.env.DATABASE_URL 
-            : `${process.env.DATABASE_URL}?sslmode=require`)
+          : process.env.DATABASE_URL.includes('sslmode=require')
+            ? process.env.DATABASE_URL
+            : `${process.env.DATABASE_URL}${process.env.DATABASE_URL.includes('?') ? '&' : '?'}sslmode=require`)
       : "postgresql://localhost/gottofrotto_dev",
     databaseDriverOptions: process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost') ? {
       ssl: { 
