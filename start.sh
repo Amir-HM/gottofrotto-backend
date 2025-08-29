@@ -11,12 +11,12 @@ echo "Environment:"
 echo "NODE_ENV: $NODE_ENV"
 echo "PORT: $PORT"
 
-# Build admin dashboard (required since build artifacts don't persist)
-echo "Building admin dashboard..."
-medusa build
+# Build backend first (faster, essential for API)
+echo "Building backend..."
+NODE_OPTIONS='--max-old-space-size=256' medusa build --admin-only || echo "Admin build failed, API will still work"
 
-echo "Verifying build output..."
-ls -la .medusa/server/public/admin/ || echo "Admin directory not found"
+echo "Build completed, checking output..."
+ls -la .medusa/ 2>/dev/null || echo "No .medusa directory found"
 
 # Run database migrations
 echo "Running database migrations..."
