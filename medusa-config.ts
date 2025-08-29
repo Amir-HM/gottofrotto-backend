@@ -5,6 +5,7 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL || "postgresql://localhost/gottofrotto_dev",
+    redisUrl: process.env.REDIS_URL || undefined,
     databaseDriverOptions: {
       connection: {
         ssl: process.env.NODE_ENV === 'production' ? {
