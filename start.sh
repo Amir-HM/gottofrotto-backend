@@ -10,8 +10,9 @@ echo "Environment:"
 echo "NODE_ENV: $NODE_ENV"
 echo "PORT: $PORT"
 
-# Skip build - admin is disabled in production
-echo "Admin disabled in production for stability"
+# Build admin dashboard with 2GB RAM - should work now!
+echo "Building admin dashboard with upgraded resources..."
+NODE_OPTIONS='--max-old-space-size=1536' medusa build
 
 # Run database migrations
 echo "Running database migrations..."
