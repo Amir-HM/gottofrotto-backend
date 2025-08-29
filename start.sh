@@ -14,6 +14,14 @@ echo "PORT: $PORT"
 echo "Building admin dashboard with upgraded resources..."
 NODE_OPTIONS='--max-old-space-size=1536' medusa build
 
+# Debug: Check if admin files were actually created
+echo "Checking build output..."
+ls -la .medusa/ || echo "No .medusa directory"
+ls -la .medusa/server/ || echo "No server directory"
+ls -la .medusa/server/public/ || echo "No public directory"
+ls -la .medusa/server/public/admin/ || echo "No admin directory"
+find . -name "index.html" -type f || echo "No index.html files found"
+
 # Skip migrations for faster startup - DB is already up to date
 echo "Database already migrated, skipping migrations for faster startup..."
 
