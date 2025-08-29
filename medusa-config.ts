@@ -22,6 +22,6 @@ module.exports = defineConfig({
     }
   },
   admin: {
-    disable: false
+    disable: process.env.NODE_ENV === 'production'
   }
 })

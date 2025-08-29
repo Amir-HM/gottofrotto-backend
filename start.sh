@@ -10,12 +10,8 @@ echo "Environment:"
 echo "NODE_ENV: $NODE_ENV"
 echo "PORT: $PORT"
 
-# Build admin dashboard - try with reduced resources
-echo "Building admin dashboard..."
-NODE_OPTIONS='--max-old-space-size=768' medusa build || {
-    echo "Build failed, starting without admin..."
-    export DISABLE_ADMIN=true
-}
+# Skip build - admin is disabled in production
+echo "Admin disabled in production for stability"
 
 # Run database migrations
 echo "Running database migrations..."
