@@ -32,18 +32,34 @@ echo "Environment check:"
 echo "NODE_ENV: ${NODE_ENV}"
 echo "DATABASE_URL exists: $([ -n "$DATABASE_URL" ] && echo "yes" || echo "no")"
 
-# Start the server - use medusa start from build directory
-echo "Starting server directly with medusa start from build context..."
+# Start the server using Node.js directly with proper setup
+echo "Setting up server environment..."
 cd .medusa/server
 echo "Current directory: $(pwd)"
-echo "Files in build directory:"
+echo "Available files:"
 ls -la
 
-# Set environment and start server with medusa command from build context
-echo "Starting medusa server from built context..."
-export NODE_ENV=production
+# Set environment variables
+export NODE_ENV=production  
 export PORT=${PORT:-9000}
 export HOST=0.0.0.0
+export DATABASE_URL="${DATABASE_URL}"
+export JWT_SECRET="${JWT_SECRET}"
+export COOKIE_SECRET="${COOKIE_SECRET}"
 
-# Use medusa start but from the built server context
-medusa start --host 0.0.0.0 --port ${PORT:-9000}
+# Look for the actual server entry point
+echo "Looking for server entry points..."
+if [ -f "src/index.js" ]; then
+    echo "Starting with src/index.js"
+    node src/index.js
+elif [ -f "index.js" ]; then
+    echo "Starting with index.js" 
+    node index.js
+else
+    echo "Checking package.json for start script..."
+    if [ -f "package.json" ]; then
+        cat package.json | grep -A 5 -B 5 "start"
+    fi
+    echo "Attempting to start with instrumentation.js as fallback..."
+    node instrumentation.js
+fi
