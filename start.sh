@@ -32,5 +32,9 @@ echo "Environment check:"
 echo "NODE_ENV: ${NODE_ENV}"
 echo "DATABASE_URL exists: $([ -n "$DATABASE_URL" ] && echo "yes" || echo "no")"
 
-# Try starting with explicit environment
-NODE_ENV=production medusa start --host 0.0.0.0 --port ${PORT:-9000}
+# Start the server using the built files directly
+echo "About to start medusa server using built files..."
+echo "Checking server build directory..."
+ls -la .medusa/server/
+echo "Starting with node directly from build..."
+cd .medusa/server && HOST=0.0.0.0 PORT=${PORT:-9000} NODE_ENV=production node dist/index.js
