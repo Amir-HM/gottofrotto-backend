@@ -11,14 +11,13 @@ echo "HOST: 0.0.0.0"
 echo "PORT: $PORT"
 echo "NODE_ENV: $NODE_ENV"
 
-# Only build if admin files don't exist (backup)
-if [ ! -f ".medusa/server/public/admin/index.html" ]; then
-    echo "Admin build files not found, building..."
-    export NODE_OPTIONS='--max-old-space-size=512'
-    npx medusa build
-else
-    echo "Admin build files found, skipping build"
-fi
+# Always build since files don't persist from build phase to runtime
+echo "Building admin dashboard..."
+export NODE_OPTIONS='--max-old-space-size=768'
+npx medusa build
+
+echo "Verifying build output..."
+ls -la .medusa/server/public/admin/ || echo "Admin directory not found after build"
 
 # Run database migrations
 echo "Running database migrations..."
