@@ -1,69 +1,16 @@
 #!/bin/bash
 set -e
 
-echo "Starting Medusa server with admin dashboard..."
+echo "=== Starting Gottofrotto Backend ==="
+echo "NODE_ENV: ${NODE_ENV:-development}"
+echo "PORT: ${PORT:-9000}"
 
-# Set environment variables for production
-export NODE_TLS_REJECT_UNAUTHORIZED=0
+# Skip build - use pre-built files from buildpack
+echo "Using pre-built admin files from buildpack..."
 
-echo "Environment:"
-echo "NODE_ENV: $NODE_ENV" 
-echo "PORT: $PORT"
+# Skip migrations - already done
+echo "Skipping migrations..."
 
-# Build admin dashboard with 2GB RAM - should work now!
-echo "Building admin dashboard with upgraded resources..."
-NODE_OPTIONS='--max-old-space-size=1536' medusa build
-
-# Debug: Check if admin files were actually created
-echo "Checking build output..."
-ls -la .medusa/ || echo "No .medusa directory"
-ls -la .medusa/server/ || echo "No server directory"
-ls -la .medusa/server/public/ || echo "No public directory"
-ls -la .medusa/server/public/admin/ || echo "No admin directory"
-find . -name "index.html" -type f || echo "No index.html files found"
-
-# Skip migrations for faster startup - DB is already up to date
-echo "Database already migrated, skipping migrations for faster startup..."
-
-# Start the server - should be fast now  
-echo "Starting server on port ${PORT:-9000}..."
-echo "Host binding: 0.0.0.0"
-echo "Environment check:"
-echo "NODE_ENV: ${NODE_ENV}"
-echo "DATABASE_URL exists: $([ -n "$DATABASE_URL" ] && echo "yes" || echo "no")"
-
-# Start the server using Node.js directly with proper setup
-echo "Setting up server environment..."
-cd .medusa/server
-echo "Current directory: $(pwd)"
-echo "Available files:"
-ls -la
-
-# Set environment variables
-export NODE_ENV=production  
-export PORT=${PORT:-9000}
-export HOST=0.0.0.0
-export DATABASE_URL="${DATABASE_URL}"
-export JWT_SECRET="${JWT_SECRET}"
-export COOKIE_SECRET="${COOKIE_SECRET}"
-
-# Look for the actual server entry point
-echo "Looking for server entry points..."
-echo "Contents of src directory:"
-ls -la src/ 2>/dev/null || echo "No src directory"
-
-# Try different potential entry points
-if [ -f "src/index.js" ]; then
-    echo "Starting with src/index.js"
-    node src/index.js
-elif [ -f "index.js" ]; then
-    echo "Starting with index.js" 
-    node index.js
-else
-    echo "No standard entry points found. Trying alternative approach..."
-    echo "Going back to parent directory and using medusa start..."
-    cd /workspace
-    echo "Current directory: $(pwd)"
-    echo "Starting medusa from project root with explicit config..."
-    NODE_ENV=production PORT=${PORT:-9000} medusa start --host 0.0.0.0 --port ${PORT:-9000}
-fi
+# Start server with minimal approach
+echo "Starting Medusa server..."
+exec medusa start --host 0.0.0.0 --port ${PORT:-9000}
