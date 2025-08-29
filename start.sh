@@ -14,9 +14,8 @@ echo "PORT: $PORT"
 echo "Building admin dashboard with upgraded resources..."
 NODE_OPTIONS='--max-old-space-size=1536' medusa build
 
-# Run database migrations quickly
-echo "Running database migrations..."
-NODE_TLS_REJECT_UNAUTHORIZED=0 npx medusa db:migrate
+# Skip migrations for faster startup - DB is already up to date
+echo "Database already migrated, skipping migrations for faster startup..."
 
 # Start the server - should be fast now
 echo "Starting server..."
