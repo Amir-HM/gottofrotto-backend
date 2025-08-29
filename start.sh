@@ -32,29 +32,18 @@ echo "Environment check:"
 echo "NODE_ENV: ${NODE_ENV}"
 echo "DATABASE_URL exists: $([ -n "$DATABASE_URL" ] && echo "yes" || echo "no")"
 
-# Start the server using the built files directly
-echo "About to start medusa server using built files..."
-echo "Checking server build directory structure..."
-ls -la .medusa/server/
-echo "Contents of server directory:"
-find .medusa/server/ -name "*.js" | head -10
-echo "Looking for main server file..."
-if [ -f ".medusa/server/index.js" ]; then
-    echo "Found index.js, starting server..."
-    cd .medusa/server && HOST=0.0.0.0 PORT=${PORT:-9000} NODE_ENV=production node index.js
-elif [ -f ".medusa/server/server.js" ]; then
-    echo "Found server.js, starting server..."
-    cd .medusa/server && HOST=0.0.0.0 PORT=${PORT:-9000} NODE_ENV=production node server.js
-else
-    echo "Looking for any js files to start..."
-    cd .medusa/server && find . -name "*.js" -maxdepth 2
-    echo "Trying to start with the first .js file found..."
-    JS_FILE=$(find . -name "*.js" -maxdepth 2 | head -1)
-    if [ -n "$JS_FILE" ]; then
-        echo "Starting with: $JS_FILE"
-        HOST=0.0.0.0 PORT=${PORT:-9000} NODE_ENV=production node "$JS_FILE"
-    else
-        echo "ERROR: No JavaScript files found to start server!"
-        exit 1
-    fi
-fi
+# Start the server - use medusa start from build directory
+echo "Starting server directly with medusa start from build context..."
+cd .medusa/server
+echo "Current directory: $(pwd)"
+echo "Files in build directory:"
+ls -la
+
+# Set environment and start server with medusa command from build context
+echo "Starting medusa server from built context..."
+export NODE_ENV=production
+export PORT=${PORT:-9000}
+export HOST=0.0.0.0
+
+# Use medusa start but from the built server context
+medusa start --host 0.0.0.0 --port ${PORT:-9000}
