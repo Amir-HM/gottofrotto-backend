@@ -25,6 +25,12 @@ find . -name "index.html" -type f || echo "No index.html files found"
 # Skip migrations for faster startup - DB is already up to date
 echo "Database already migrated, skipping migrations for faster startup..."
 
-# Start the server - should be fast now
-echo "Starting server..."
-medusa start --host 0.0.0.0 --port ${PORT:-9000}
+# Start the server - should be fast now  
+echo "Starting server on port ${PORT:-9000}..."
+echo "Host binding: 0.0.0.0"
+echo "Environment check:"
+echo "NODE_ENV: ${NODE_ENV}"
+echo "DATABASE_URL exists: $([ -n "$DATABASE_URL" ] && echo "yes" || echo "no")"
+
+# Try starting with explicit environment
+NODE_ENV=production medusa start --host 0.0.0.0 --port ${PORT:-9000}
