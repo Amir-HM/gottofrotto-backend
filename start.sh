@@ -7,17 +7,17 @@ echo "Starting Medusa server with admin dashboard..."
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 
 echo "Environment:"
-echo "NODE_ENV: $NODE_ENV"
+echo "NODE_ENV: $NODE_ENV" 
 echo "PORT: $PORT"
 
 # Build admin dashboard with 2GB RAM - should work now!
 echo "Building admin dashboard with upgraded resources..."
 NODE_OPTIONS='--max-old-space-size=1536' medusa build
 
-# Run database migrations
+# Run database migrations quickly
 echo "Running database migrations..."
-npx medusa db:migrate
+NODE_TLS_REJECT_UNAUTHORIZED=0 npx medusa db:migrate
 
-# Start the server
+# Start the server - should be fast now
 echo "Starting server..."
 medusa start --host 0.0.0.0 --port ${PORT:-9000}

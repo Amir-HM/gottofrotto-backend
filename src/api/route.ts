@@ -1,14 +1,16 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
-  res.json({
+  res.status(200).json({
     message: "🎉 Gottofrotto Backend is Live!",
-    version: "2.0",
+    version: "2.0", 
     apis: {
       store: "/store",
-      admin: "/admin", 
+      admin: "/admin",
+      adminUI: "/app",
       health: "/health"
     },
-    status: "operational"
+    status: "operational",
+    timestamp: new Date().toISOString()
   })
 }
