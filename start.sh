@@ -49,6 +49,10 @@ export COOKIE_SECRET="${COOKIE_SECRET}"
 
 # Look for the actual server entry point
 echo "Looking for server entry points..."
+echo "Contents of src directory:"
+ls -la src/ 2>/dev/null || echo "No src directory"
+
+# Try different potential entry points
 if [ -f "src/index.js" ]; then
     echo "Starting with src/index.js"
     node src/index.js
@@ -56,10 +60,10 @@ elif [ -f "index.js" ]; then
     echo "Starting with index.js" 
     node index.js
 else
-    echo "Checking package.json for start script..."
-    if [ -f "package.json" ]; then
-        cat package.json | grep -A 5 -B 5 "start"
-    fi
-    echo "Attempting to start with instrumentation.js as fallback..."
-    node instrumentation.js
+    echo "No standard entry points found. Trying alternative approach..."
+    echo "Going back to parent directory and using medusa start..."
+    cd /workspace
+    echo "Current directory: $(pwd)"
+    echo "Starting medusa from project root with explicit config..."
+    NODE_ENV=production PORT=${PORT:-9000} medusa start --host 0.0.0.0 --port ${PORT:-9000}
 fi
