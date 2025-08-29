@@ -15,7 +15,7 @@
   "scripts": {
     "build": "NODE_OPTIONS='--max-old-space-size=1024' medusa build",
     "seed": "medusa exec ./src/scripts/seed.ts",
-    "start": "NODE_OPTIONS='--max-old-space-size=1024' medusa build && NODE_TLS_REJECT_UNAUTHORIZED=0 npx medusa db:migrate && NODE_TLS_REJECT_UNAUTHORIZED=0 medusa start",
+    "start": "NODE_OPTIONS='--max-old-space-size=1024' medusa build && HOST=0.0.0.0 PORT=${PORT:-9000} NODE_TLS_REJECT_UNAUTHORIZED=0 npx medusa db:migrate && HOST=0.0.0.0 PORT=${PORT:-9000} NODE_TLS_REJECT_UNAUTHORIZED=0 medusa start",
     "dev": "medusa develop",
     "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
     "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
@@ -38,6 +38,7 @@
     "posthog-node": "^4.18.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.9",
     "@medusajs/test-utils": "2.9.0",
     "@mikro-orm/cli": "6.4.3",
     "@swc/core": "1.5.7",
