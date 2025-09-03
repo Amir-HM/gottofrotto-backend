@@ -30,15 +30,15 @@ echo "Skipping database creation - Digital Ocean database already exists"
 echo "Running database migrations FIRST..."
 echo "Attempting to create database tables..."
 
-# Try migration using yarn
+# Try migration using npx (yarn dlx not available in yarn 1.x)
 echo "Starting migration process..."
-if yarn dlx @medusajs/cli@latest db:migrate; then
+if npx @medusajs/cli@latest db:migrate; then
     echo "Migration completed successfully!"
 else
     MIGRATION_EXIT_CODE=$?
     echo "Migration failed with exit code: $MIGRATION_EXIT_CODE"
     echo "Retrying migration once more..."
-    if yarn dlx @medusajs/cli@latest db:migrate; then
+    if npx @medusajs/cli@latest db:migrate; then
         echo "Migration completed successfully on retry!"
     else
         echo "ERROR: All migration attempts failed!"
@@ -66,4 +66,4 @@ ls -la .medusa/server/public/admin/ || echo "Admin directory not found after bui
 
 # Start the server with explicit host and port
 echo "Starting server on 0.0.0.0:${PORT:-9000}..."
-yarn dlx @medusajs/cli@latest start --host 0.0.0.0 --port ${PORT:-9000}
+npx @medusajs/cli@latest start --host 0.0.0.0 --port ${PORT:-9000}
