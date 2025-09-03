@@ -5,14 +5,15 @@ echo "=== Starting Gottofrotto Backend API ==="
 echo "NODE_ENV: ${NODE_ENV:-development}"
 echo "PORT: ${PORT:-9000}"
 
-# Build application with admin UI
+# Build with reduced memory for resource-constrained environments
 echo "Building application (backend + admin UI)..."
-NODE_OPTIONS='--max-old-space-size=1536' medusa build
+echo "Using reduced memory allocation for build..."
+NODE_OPTIONS='--max-old-space-size=512' medusa build
 
 # Run database migrations
 echo "Running database migrations..."
 medusa db:migrate
 
-# Start server
+# Start server with reduced memory
 echo "Starting Medusa API server..."
-exec medusa start --host 0.0.0.0 --port ${PORT:-9000}
+NODE_OPTIONS='--max-old-space-size=256' exec medusa start --host 0.0.0.0 --port ${PORT:-9000}
