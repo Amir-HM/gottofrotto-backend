@@ -66,4 +66,38 @@ ls -la .medusa/server/public/admin/ || echo "Admin directory not found after bui
 
 # Start the server with explicit host and port
 echo "Starting server on 0.0.0.0:${PORT:-9000}..."
-npx @medusajs/cli@latest start --host 0.0.0.0 --port ${PORT:-9000}
+# Start server in background
+npx @medusajs/cli@latest start --host 0.0.0.0 --port ${PORT:-9000} &
+SERVER_PID=$!
+
+echo "Server started with PID $SERVER_PID, waiting for it to accept connections..."
+
+# Wait for server to be ready (poll localhost:PORT)
+PORT_TO_CHECK=${PORT:-9000}
+MAX_WAIT=60
+WAITED=0
+while ! nc -z 127.0.0.1 "$PORT_TO_CHECK"; do
+  sleep 1
+  WAITED=$((WAITED+1))
+  if [ "$WAITED" -ge "$MAX_WAIT" ]; then
+    echo "Server did not start within $MAX_WAIT seconds"
+    kill $SERVER_PID || true
+    exit 1
+  fi
+done
+
+echo "Server is accepting connections on port $PORT_TO_CHECK"
+
+# Run seeding in background so startup is not blocked by seeding
+echo "Starting seeding in background..."
+(yarn seed && echo "Seeding completed") &
+SEED_PID=$!
+
+echo "Seeding started with PID $SEED_PID"
+
+# Wait on the server process so container stays alive
+wait $SERVER_PID
+EXIT_CODE=$?
+
+echo "Server process exited with code $EXIT_CODE"
+exit $EXIT_CODE
