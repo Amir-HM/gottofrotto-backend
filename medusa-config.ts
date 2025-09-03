@@ -4,7 +4,8 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
   admin: {
-    path: "/app"
+    path: "/app",
+    disable: false
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL || "postgresql://localhost/gottofrotto_dev",
