@@ -11,17 +11,10 @@ NODE_OPTIONS='--max-old-space-size=1536' medusa build
 
 # Verify admin build files exist
 echo "Verifying admin build..."
-if [ -d ".medusa/server/public/admin" ]; then
-    echo "Admin build directory found"
-    ls -la .medusa/server/public/admin/
-    if [ -f ".medusa/server/public/admin/index.html" ]; then
-        echo "✅ Admin index.html found"
-    else
-        echo "❌ Admin index.html missing"
-    fi
-else
-    echo "❌ Admin build directory missing"
-fi
+echo "Checking all possible admin locations:"
+find . -name "index.html" -path "*/admin/*" 2>/dev/null || echo "No admin index.html found"
+echo "Contents of .medusa directory:"
+find .medusa -type f 2>/dev/null | head -20
 
 # Start server (migrations already completed)
 echo "Starting Medusa API server..."
