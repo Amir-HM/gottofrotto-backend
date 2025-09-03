@@ -9,10 +9,6 @@ echo "PORT: ${PORT:-9000}"
 echo "Building application (backend + admin UI)..."
 NODE_OPTIONS='--max-old-space-size=1536' medusa build
 
-# Run database migrations
-echo "Running database migrations..."
-medusa db:migrate
-
-# Start server
+# Start server (migrations already completed)
 echo "Starting Medusa API server..."
 exec medusa start --host 0.0.0.0 --port ${PORT:-9000}
