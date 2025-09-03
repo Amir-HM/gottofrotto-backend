@@ -13,7 +13,9 @@
     "medusa"
   ],
   "scripts": {
-    "build": "medusa build",
+    "build": "NODE_OPTIONS='--max-old-space-size=1024' npx medusa build",
+    "postbuild": "echo 'Build completed. Admin files:' && ls -la .medusa/server/public/admin/ || echo 'Admin directory not found'",
+    "create-admin": "npx medusa exec ./scripts/create-admin.js --",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "start": "./start.sh",
     "dev": "medusa develop",
