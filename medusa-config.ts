@@ -3,6 +3,9 @@ import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
+  admin: {
+    path: "/app"
+  },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL || "postgresql://localhost/gottofrotto_dev",
     redisUrl: process.env.REDIS_URL || undefined,
