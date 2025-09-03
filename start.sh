@@ -26,9 +26,11 @@ EOF
 
 # Test database connection with detailed error handling
 echo "Testing database connection..."
-if ! npx medusa db:create; then
-    echo "Warning: Database creation failed or database already exists"
-fi
+# Skip db:create since Digital Ocean database already exists
+# if ! npx medusa db:create; then
+#     echo "Warning: Database creation failed or database already exists"
+# fi
+echo "Skipping database creation - Digital Ocean database already exists"
 
 # Always build since files don't persist from build phase to runtime
 echo "Building admin dashboard..."
@@ -46,19 +48,12 @@ echo "Attempting to create database tables..."
 if ! npx medusa db:migrate; then
     echo "Standard migration failed, trying alternative approaches..."
     
-    # Try creating database first
-    echo "Trying to create database..."
-    npx medusa db:create || true
-    
-    # Try migration again
+    # Try migration again without creating database (DO database already exists)
     echo "Retrying migration..."
     if ! npx medusa db:migrate; then
         echo "ERROR: All migration attempts failed!"
         echo "Database URL: ${DATABASE_URL:0:50}..."
-        echo "Attempting to test database connection..."
-        
-        # Last resort - try to see what's wrong
-        npx medusa db:create || echo "Database creation also failed"
+        echo "Database connection test failed - check your DATABASE_URL"
         exit 1
     fi
 fi
