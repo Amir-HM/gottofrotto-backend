@@ -37,31 +37,32 @@ echo "Building admin dashboard..."
 export NODE_OPTIONS='--max-old-space-size=768'
 npx medusa build
 
+echo "Build completed - checking files..."
 echo "Verifying build output..."
 ls -la .medusa/server/public/admin/ || echo "Admin directory not found after build"
+
+echo "About to start database migration process..."
 
 # Run database migrations with detailed error handling
 echo "Running database migrations..."
 echo "Attempting to create database tables..."
 
-# Set timeout for migration command to prevent hanging
-timeout 120 npx medusa db:migrate
-MIGRATION_EXIT_CODE=$?
-
-if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
+# Try migration without timeout first
+echo "Starting migration process..."
+if npx medusa db:migrate; then
     echo "Migration completed successfully!"
-elif [ $MIGRATION_EXIT_CODE -eq 124 ]; then
-    echo "ERROR: Migration timed out after 2 minutes"
-    exit 1
 else
+    MIGRATION_EXIT_CODE=$?
     echo "Migration failed with exit code: $MIGRATION_EXIT_CODE"
     echo "Retrying migration once more..."
-    if ! timeout 60 npx medusa db:migrate; then
+    if npx medusa db:migrate; then
+        echo "Migration completed successfully on retry!"
+    else
         echo "ERROR: All migration attempts failed!"
         echo "Database URL: ${DATABASE_URL:0:50}..."
+        echo "Checking .env file contents:"
+        head -3 .env || echo "No .env file found"
         exit 1
-    else
-        echo "Migration completed successfully on retry!"
     fi
 fi
 
