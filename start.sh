@@ -32,6 +32,44 @@ echo "Testing database connection..."
 # fi
 echo "Skipping database creation - Digital Ocean database already exists"
 
+# Run database migrations BEFORE building to ensure tables exist
+echo "Running database migrations FIRST..."
+echo "Attempting to create database tables..."
+
+# Try migration without timeout first
+echo "Starting migration process..."
+if npx medusa db:migrate; then
+    echo "Migration completed successfully!"
+else
+    MIGRATION_EXIT_CODE=$?
+    echo "Migration failed with exit code: $MIGRATION_EXIT_CODE"
+    echo "Retrying migration once more..."
+    if npx medusa db:migrate; then
+        echo "Migration completed successfully on retry!"
+    else
+        echo "ERROR: All migration attempts failed!"
+        echo "Database URL: ${DATABASE_URL:0:50}..."
+        echo "Checking .env file contents:"
+        head -3 .env || echo "No .env file found"
+        exit 1
+    fi
+fi
+
+# Seed the database if it's empty (for new Digital Ocean database)
+echo "Checking if database needs seeding..."
+if ! npx medusa exec --file ./src/scripts/seed.ts; then
+    echo "Warning: Seeding failed or database already seeded"
+fi
+
+# Always build since files don't persist from build phase to runtime
+echo "Building admin dashboard..."
+export NODE_OPTIONS='--max-old-space-size=768'
+npx medusa build
+
+echo "Build completed - checking files..."
+echo "Verifying build output..."
+ls -la .medusa/server/public/admin/ || echo "Admin directory not found after build"
+
 # Always build since files don't persist from build phase to runtime
 echo "Building admin dashboard..."
 export NODE_OPTIONS='--max-old-space-size=768'
