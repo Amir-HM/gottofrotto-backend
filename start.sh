@@ -24,6 +24,11 @@ ADMIN_CORS=$ADMIN_CORS
 AUTH_CORS=$AUTH_CORS
 EOF
 
+# Ensure the process binds to all interfaces so Digital Ocean health checks
+# that hit the pod IP (not just localhost) succeed.
+export HOST=${HOST:-0.0.0.0}
+export PORT=${PORT:-9000}
+
 echo "Skipping database creation - Digital Ocean database already exists"
 
 # Run database migrations BEFORE building to ensure tables exist
@@ -49,11 +54,8 @@ else
     fi
 fi
 
-# Seed the database if it's empty (for new Digital Ocean database)
-echo "Checking if database needs seeding..."
-if ! yarn seed; then
-    echo "Warning: Seeding failed or database already seeded"
-fi
+# Migrations completed. We'll run seeding after the server is accepting
+# connections (in background) to avoid blocking readiness probes.
 
 # Always build since files don't persist from build phase to runtime
 echo "Building admin dashboard..."
@@ -65,18 +67,38 @@ echo "Verifying build output..."
 ls -la .medusa/server/public/admin/ || echo "Admin directory not found after build"
 
 # Start the server with explicit host and port
-echo "Starting server on 0.0.0.0:${PORT:-9000}..."
-# Start server in background
-npx @medusajs/cli@latest start --host 0.0.0.0 --port ${PORT:-9000} &
+echo "Starting server on ${HOST}:${PORT}..."
+# Start server in background (still pass host/port explicitly)
+npx @medusajs/cli@latest start --host ${HOST} --port ${PORT} &
 SERVER_PID=$!
 
 echo "Server started with PID $SERVER_PID, waiting for it to accept connections..."
 
 # Wait for server to be ready (poll localhost:PORT)
 PORT_TO_CHECK=${PORT:-9000}
-MAX_WAIT=60
+# Give the server more time to bind in noisy environments
+MAX_WAIT=120
 WAITED=0
-while ! nc -z 127.0.0.1 "$PORT_TO_CHECK"; do
+
+# Get a container-local IP to check (if available)
+CONTAINER_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+
+echo "Waiting up to $MAX_WAIT seconds for server to accept connections on port $PORT_TO_CHECK..."
+while true; do
+  # Check localhost first
+  if bash -c "</dev/tcp/127.0.0.1/$PORT_TO_CHECK" >/dev/null 2>&1; then
+    echo "Server is accepting connections on 127.0.0.1:$PORT_TO_CHECK"
+    break
+  fi
+
+  # If we have a container IP, try that too (Digital Ocean health checks target the pod IP)
+  if [ -n "$CONTAINER_IP" ]; then
+    if bash -c "</dev/tcp/$CONTAINER_IP/$PORT_TO_CHECK" >/dev/null 2>&1; then
+      echo "Server is accepting connections on $CONTAINER_IP:$PORT_TO_CHECK"
+      break
+    fi
+  fi
+
   sleep 1
   WAITED=$((WAITED+1))
   if [ "$WAITED" -ge "$MAX_WAIT" ]; then
@@ -85,8 +107,6 @@ while ! nc -z 127.0.0.1 "$PORT_TO_CHECK"; do
     exit 1
   fi
 done
-
-echo "Server is accepting connections on port $PORT_TO_CHECK"
 
 # Run seeding in background so startup is not blocked by seeding
 echo "Starting seeding in background..."
