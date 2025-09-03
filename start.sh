@@ -44,21 +44,26 @@ ls -la .medusa/server/public/admin/ || echo "Admin directory not found after bui
 echo "Running database migrations..."
 echo "Attempting to create database tables..."
 
-# Try different migration approaches
-if ! npx medusa db:migrate; then
-    echo "Standard migration failed, trying alternative approaches..."
-    
-    # Try migration again without creating database (DO database already exists)
-    echo "Retrying migration..."
-    if ! npx medusa db:migrate; then
+# Set timeout for migration command to prevent hanging
+timeout 120 npx medusa db:migrate
+MIGRATION_EXIT_CODE=$?
+
+if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
+    echo "Migration completed successfully!"
+elif [ $MIGRATION_EXIT_CODE -eq 124 ]; then
+    echo "ERROR: Migration timed out after 2 minutes"
+    exit 1
+else
+    echo "Migration failed with exit code: $MIGRATION_EXIT_CODE"
+    echo "Retrying migration once more..."
+    if ! timeout 60 npx medusa db:migrate; then
         echo "ERROR: All migration attempts failed!"
         echo "Database URL: ${DATABASE_URL:0:50}..."
-        echo "Database connection test failed - check your DATABASE_URL"
         exit 1
+    else
+        echo "Migration completed successfully on retry!"
     fi
 fi
-
-echo "Migration completed successfully!"
 
 # Seed the database if it's empty (for new Digital Ocean database)
 echo "Checking if database needs seeding..."
