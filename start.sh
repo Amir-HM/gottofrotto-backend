@@ -12,6 +12,18 @@ echo "PORT: $PORT"
 echo "NODE_ENV: $NODE_ENV"
 echo "DATABASE_URL: ${DATABASE_URL:0:50}..." # Only show first 50 chars for security
 
+# Create .env file for Medusa CLI commands since they require it
+echo "Creating .env file for Medusa CLI..."
+cat > .env << EOF
+DATABASE_URL=$DATABASE_URL
+JWT_SECRET=$JWT_SECRET
+COOKIE_SECRET=$COOKIE_SECRET
+NODE_ENV=$NODE_ENV
+STORE_CORS=$STORE_CORS
+ADMIN_CORS=$ADMIN_CORS
+AUTH_CORS=$AUTH_CORS
+EOF
+
 # Test database connection with detailed error handling
 echo "Testing database connection..."
 if ! npx medusa db:create; then
