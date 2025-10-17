@@ -30,15 +30,12 @@ module.exports = defineConfig({
     notification: {
       resolve: "@medusajs/notification",
       options: {
-        provider_id: "resend", // Use Resend for notifications
-        providers: [
-          {
-            id: "resend",
-            api_key: process.env.RESEND_API_KEY,
-            from: process.env.RESEND_FROM || "default@resend.dev",
-          },
-        ],
-      },
-    },
+        provider: "resend",
+        resend: {
+          apiKey: process.env.RESEND_API_KEY,
+          from: process.env.RESEND_FROM || "default@resend.dev"
+        }
+      }
+    }
   },
 })
