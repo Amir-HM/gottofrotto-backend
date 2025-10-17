@@ -1927,18 +1927,13 @@
     tailwindcss "^3.3.6"
     vite "^5.4.14"
 
-"@medusajs/admin-sdk@2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@medusajs/admin-sdk/-/admin-sdk-2.10.0.tgz#d85d7186c6f19fa377b15c9b3268f088eeaa8dc1"
-  integrity sha512-DSmR80RuZvDOKfP90/e6Q8jdwTZjL+llnrCSfKaZ0EVQGSHSRalUjyoAMAzFAl/vwvbkdaG5qrMErajQcfvsyA==
+"@medusajs/admin-sdk@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/admin-sdk/-/admin-sdk-2.10.3.tgz#4f8cb8bcf8c55ed8366df3f91a7cd7d4d4bb00ff"
+  integrity sha512-r79MwKzXVg2dIznczZ9MjOd3r6TwO7bizWBF4B88y/6r2YIL/p+FFX54nkFRKPIFlXOPuQjYNhFqJGNnP0POAQ==
   dependencies:
-    "@medusajs/admin-shared" "2.10.0"
+    "@medusajs/admin-shared" "2.10.3"
     zod "3.25.76"
-
-"@medusajs/admin-shared@2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@medusajs/admin-shared/-/admin-shared-2.10.0.tgz#d8a5e5ed13f13dfe2ad62e0bf513397a8944e2d0"
-  integrity sha512-UOQqdFGJFVrQgAwwTSfb1+5zpsLbfQcOrmBwVnPhk9S2E9uMqvLAWR8tH/BJdf9fTY2A9Q4wWXT8gIS+ZneyOQ==
 
 "@medusajs/admin-shared@2.10.3":
   version "2.10.3"
@@ -2021,13 +2016,13 @@
   resolved "https://registry.yarnpkg.com/@medusajs/cart/-/cart-2.10.3.tgz#0d46312d29c0a1100a5e4090436b28deee2ef676"
   integrity sha512-Pr463FnqucJmW4mqygMTIWrvv/OcbG5Qi+usYiWlIWoFdzJXIb7XezsWizl5bOF/+rreY3/q/IBxsC8LZJtlTA==
 
-"@medusajs/cli@2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@medusajs/cli/-/cli-2.10.0.tgz#f656db59337084b85d7eddf3bf83a02b3d241bfb"
-  integrity sha512-vDET2s+dzLoQfDPheTn2L8cRU6m1Oo5uoXE3sF9TUSBdA243vau3+JsRNMaV18L5aFLLSNbXr/gLTha8Jd2b5g==
+"@medusajs/cli@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/cli/-/cli-2.10.3.tgz#5468c644dedfefd61fac30a3928ee94ca9ad2423"
+  integrity sha512-iuPHtLpZOhLPEqShgmoF09OIPFkyH1KlgNar7TZdBB2R94NKAC+/bQs/IMEZ1UgWJ2Z+UqVDAtUtLRCqGnHq5Q==
   dependencies:
-    "@medusajs/telemetry" "2.10.0"
-    "@medusajs/utils" "2.10.0"
+    "@medusajs/telemetry" "2.10.3"
+    "@medusajs/utils" "2.10.3"
     "@types/express" "^4.17.17"
     chalk "^4.0.0"
     configstore "5.0.1"
@@ -2417,22 +2412,6 @@
   resolved "https://registry.yarnpkg.com/@medusajs/tax/-/tax-2.10.3.tgz#482ba97b0c6fec0b80c166873305d10bba5eb6bb"
   integrity sha512-HL/RQvokDJv7ZjcxQumdTYy9feuzHYUB1dRmVLFE2P80ArPjKU0htR7arOJHzERy/QBpis0eJ0qRu01x50N5Ig==
 
-"@medusajs/telemetry@2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@medusajs/telemetry/-/telemetry-2.10.0.tgz#5318ff4ff6b90fc27a9671ee5c8baa5548018c80"
-  integrity sha512-3b+XmI49rmRv00ry8ltSjBDVrt4+dbhCRy88ZiQhnuoTDybs0g96GYW+orXTXgvLWgsB7lVeYolo8ePvXP+8pw==
-  dependencies:
-    "@babel/runtime" "^7.22.10"
-    axios "^0.21.4"
-    axios-retry "^3.1.9"
-    boxen "^5.0.1"
-    ci-info "^3.2.0"
-    configstore "5.0.1"
-    global "^4.4.0"
-    is-docker "^2.2.1"
-    remove-trailing-slash "^0.1.1"
-    uuid "^8.3.2"
-
 "@medusajs/telemetry@2.10.3":
   version "2.10.3"
   resolved "https://registry.yarnpkg.com/@medusajs/telemetry/-/telemetry-2.10.3.tgz#5342ffdd39efc8f7d05a57f82e2d664829189621"
@@ -2449,23 +2428,16 @@
     remove-trailing-slash "^0.1.1"
     uuid "^8.3.2"
 
-"@medusajs/test-utils@2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@medusajs/test-utils/-/test-utils-2.10.0.tgz#aa07322f83d2a269f9d81466551ceaef6241236c"
-  integrity sha512-sYO/C8DwwyGDIoV1D/uTvPh5WiEh0HsncdNMS5k/rMfisDz1wN2BtSOS8cDkcJsnzXYQ84ChDOkDp5YsAYUxXg==
+"@medusajs/test-utils@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/test-utils/-/test-utils-2.10.3.tgz#0df2919d01eece2f057728869e99308db1a04705"
+  integrity sha512-HaTGXuDmTxvMhiqEb80sClrUzNb0x+kegY5iQlUt6HpM4c9sjafjF8O/AtqWGCrM7l99m2Pi8lLHOYhUl+L2zQ==
   dependencies:
     "@types/express" "^4.17.17"
     axios "^0.21.4"
     express "^4.21.0"
     get-port "^5.1.0"
     randomatic "^3.1.1"
-
-"@medusajs/types@2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@medusajs/types/-/types-2.10.0.tgz#0266193e0b07e38546cbd551f489b8d2caae4604"
-  integrity sha512-W4phrYGeXHVJYKygQF6Qj3vxAQAXfO90Bs/1M628pDpIoN27Ch1U16D1gApPww1dNSMASUeD2RBlmHMrscl3EA==
-  dependencies:
-    bignumber.js "^9.1.2"
 
 "@medusajs/types@2.10.3":
   version "2.10.3"
@@ -2504,27 +2476,6 @@
   integrity sha512-LSLHBEPY7MvDnhFDt4L6/KanwVAfFgTGijdr6cO05KYlxqzEo6ZMc1L81Z6Ost4rC7xp6YFGsuWfQ/cJyWamfg==
   dependencies:
     jsonwebtoken "^9.0.2"
-
-"@medusajs/utils@2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@medusajs/utils/-/utils-2.10.0.tgz#e694185dd25297d4c233c1692728ea69d04e3952"
-  integrity sha512-mArkBaQTyXYL8zqVUQ3ag17piE0Fw2fRjEqLPcG+yTmPl7kJC3iwU3O/kl8rZ7Q/PcmXqB18+2Zyba3gg7IAkQ==
-  dependencies:
-    "@graphql-codegen/core" "^4.0.2"
-    "@graphql-codegen/typescript" "^4.0.9"
-    "@graphql-tools/merge" "^9.0.7"
-    "@graphql-tools/schema" "^10.0.6"
-    "@medusajs/types" "2.10.0"
-    "@types/pluralize" "^0.0.33"
-    bignumber.js "^9.1.2"
-    dotenv "^16.4.5"
-    dotenv-expand "^11.0.6"
-    graphql "^16.9.0"
-    jsonwebtoken "^9.0.2"
-    pg-connection-string "^2.7.0"
-    pluralize "^8.0.0"
-    ulid "^2.3.0"
-    zod "3.25.76"
 
 "@medusajs/utils@2.10.3":
   version "2.10.3"
