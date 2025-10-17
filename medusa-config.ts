@@ -4,7 +4,7 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
   admin: {
-    path: "/app", 
+    path: "/app",
     disable: false
   },
   projectConfig: {
@@ -24,5 +24,21 @@ module.exports = defineConfig({
       jwtSecret: process.env.JWT_SECRET || "supersecret",
       cookieSecret: process.env.COOKIE_SECRET || "supersecret"
     }
-  }
+  },
+  // THIS SECTION FOR RESEND SUPPORT
+  modules: {
+    notification: {
+      resolve: "@medusajs/notification",
+      options: {
+        provider_id: "resend", // Use Resend for notifications
+        providers: {
+          resend: {
+            api_key: process.env.RESEND_API_KEY,
+            // Optionally set a default "from" address:
+            from: process.env.RESEND_FROM || "default@resend.dev",
+          },
+        },
+      },
+    },
+  },
 })
