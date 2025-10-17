@@ -28,12 +28,14 @@
     "@medusajs/cli": "2.10.0",
     "@medusajs/framework": "2.10.0",
     "@medusajs/medusa": "2.10.0",
+    "@medusajs/notification": "^2.10.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
     "@mikro-orm/migrations": "6.4.3",
     "@mikro-orm/postgresql": "6.4.3",
     "awilix": "^8.0.1",
-    "pg": "^8.13.0"
+    "pg": "^8.13.0",
+    "render": "^0.1.4"
   },
   "devDependencies": {
     "@medusajs/test-utils": "2.10.0",
