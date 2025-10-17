@@ -10,13 +10,16 @@ module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     redisUrl: process.env.REDIS_URL,
-    databaseDriverOptions: process.env.NODE_ENV === 'production' ? {
-      connection: {
-        ssl: {
-          rejectUnauthorized: false
+    // Ensures connection works with self-signed certs in DigitalOcean Postgres
+    databaseDriverOptions: process.env.NODE_ENV === 'production'
+      ? {
+          connection: {
+            ssl: {
+              rejectUnauthorized: false // <-- Accept self-signed certs
+            }
+          }
         }
-      }
-    } : {},
+      : {},
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -25,17 +28,19 @@ module.exports = defineConfig({
       cookieSecret: process.env.COOKIE_SECRET || "supersecret"
     }
   },
-  // ---- NOTIFICATION MODULE WITH RESEND ----
   modules: {
     notification: {
       resolve: "@medusajs/notification",
       options: {
-        provider: "resend",
-        resend: {
-          apiKey: process.env.RESEND_API_KEY,
-          from: process.env.RESEND_FROM || "default@resend.dev"
-        }
+        provider_id: "resend",
+        providers: [
+          {
+            id: "resend",
+            api_key: process.env.RESEND_API_KEY,
+            from: process.env.RESEND_FROM || "onboarding@resend.dev",
+          }
+        ]
       }
     }
-  },
+  }
 })
