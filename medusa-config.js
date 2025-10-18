@@ -1,4 +1,5 @@
 // medusa-config.js
+
 const { loadEnv, defineConfig } = require("@medusajs/framework/utils");
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd());
@@ -30,15 +31,13 @@ module.exports = defineConfig({
     notification: {
       resolve: "@medusajs/notification",
       options: {
-        provider_id: "resend",
-        providers: [
-          {
-            id: "resend",
-            api_key: process.env.RESEND_API_KEY,
-            from: process.env.RESEND_FROM || "onboarding@resend.dev",
-          }
-        ]
+        provider: {
+          id: "resend",
+          api_key: process.env.RESEND_API_KEY,
+          from: process.env.RESEND_FROM || "onboarding@resend.dev"
+        }
       }
     }
+    // Add more modules as needed, in the same object form!
   }
 });
