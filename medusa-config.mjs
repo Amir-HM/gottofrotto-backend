@@ -1,8 +1,8 @@
-import { loadEnv, defineConfig } from '@medusajs/framework/utils'
+import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 
-loadEnv(process.env.NODE_ENV || 'development', process.cwd())
+loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
-module.exports = defineConfig({
+export default defineConfig({
   admin: {
     path: "/app",
     disable: false
@@ -10,13 +10,10 @@ module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     redisUrl: process.env.REDIS_URL,
-    // Ensures connection works with self-signed certs in DigitalOcean Postgres
-    databaseDriverOptions: process.env.NODE_ENV === 'production'
+    databaseDriverOptions: process.env.NODE_ENV === "production"
       ? {
           connection: {
-            ssl: {
-              rejectUnauthorized: false // <-- Accept self-signed certs
-            }
+            ssl: { rejectUnauthorized: false }
           }
         }
       : {},
