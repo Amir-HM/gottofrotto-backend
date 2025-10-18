@@ -1,8 +1,9 @@
-import { loadEnv, defineConfig } from "@medusajs/framework/utils"
+// medusa-config.js
+const { loadEnv, defineConfig } = require("@medusajs/framework/utils");
 
-loadEnv(process.env.NODE_ENV || "development", process.cwd())
+loadEnv(process.env.NODE_ENV || "development", process.cwd());
 
-export default defineConfig({
+module.exports = defineConfig({
   admin: {
     path: "/app",
     disable: false
@@ -40,4 +41,4 @@ export default defineConfig({
       }
     }
   }
-})
+});
