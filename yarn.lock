@@ -5814,7 +5814,7 @@ axios@^0.21.4:
   dependencies:
     follow-redirects "^1.14.0"
 
-axios@^1.12.0:
+axios@^1.12.0, axios@^1.8.2:
   version "1.12.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.12.2.tgz#6c307390136cf7a2278d09cec63b136dfc6e6da7"
   integrity sha512-vMJzPewAlRyOgxV2dU0Cuz2O8zzzx9VYtbJOaBgXFeLc4IV/Eg50n4LowmehOOR61S8ZMpc2K5Sa7g6A4jfkUw==
@@ -9393,6 +9393,13 @@ postgres-interval@^1.1.0:
   integrity sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==
   dependencies:
     xtend "^4.0.0"
+
+posthog-node@^4.17.1:
+  version "4.18.0"
+  resolved "https://registry.yarnpkg.com/posthog-node/-/posthog-node-4.18.0.tgz#dc520b857a5de7c3b03683a20e90257d84344af0"
+  integrity sha512-XROs1h+DNatgKh/AlIlCtDxWzwrKdYDb2mOs58n4yN8BkGN9ewqeQwG5ApS4/IzwCb7HPttUkOVulkYatd2PIw==
+  dependencies:
+    axios "^1.8.2"
 
 pretty-format@^29.0.0, pretty-format@^29.7.0:
   version "29.7.0"
