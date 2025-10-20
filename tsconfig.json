@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "ES2021",
     "esModuleInterop": true,
-    "module": "Node16",
-    "moduleResolution": "Node16",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
@@ -16,6 +16,11 @@
     "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@medusajs/framework/*": ["node_modules/@medusajs/framework/dist/*"],
+      "@medusajs/medusa/*": ["node_modules/@medusajs/medusa/dist/*"]
+    },
     "checkJs": false,
     "strictNullChecks": true
   },
