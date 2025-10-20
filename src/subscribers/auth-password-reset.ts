@@ -2,6 +2,7 @@ import type {
   SubscriberArgs,
   SubscriberConfig,
 } from "@medusajs/framework"
+import type { NotificationTypes } from "@medusajs/types"
 import { AuthWorkflowEvents } from "@medusajs/framework/utils"
 
 type PasswordResetEvent = {
@@ -50,7 +51,7 @@ export default async function sendPasswordResetEmail({
     "<p>This link expires in 15 minutes. If you didn’t request the reset you can ignore this email.</p>",
   ].join("")
 
-  await notificationService.createNotifications({
+  const notifications = await notificationService.createNotifications({
     to: recipient,
     channel: DEFAULT_CHANNEL,
     template: DEFAULT_TEMPLATE,
@@ -66,6 +67,29 @@ export default async function sendPasswordResetEmail({
       html,
     },
   })
+
+  const normalized = Array.isArray(notifications)
+    ? notifications
+    : [notifications as NotificationTypes.NotificationDTO]
+
+  const failed = normalized.filter(
+    (notification) => notification.status !== "success"
+  )
+
+  if (failed.length) {
+    logger?.error?.(
+      "[notification][resend] Failed to dispatch password reset email",
+      failed
+    )
+  } else {
+    logger?.info?.(
+      "[notification][resend] Password reset email queued successfully",
+      {
+        to: recipient,
+        actor_type,
+      }
+    )
+  }
 }
 
 export const config: SubscriberConfig = {
@@ -186,6 +210,7 @@ const safeResolve = (container: any, key: string) => {
 
 type LoggerType = {
   debug?: (...args: any[]) => void
+  info?: (...args: any[]) => void
   warn?: (...args: any[]) => void
   error?: (...args: any[]) => void
 }
