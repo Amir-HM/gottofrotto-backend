@@ -33,7 +33,7 @@ export default defineConfig({
         providers: [
           {
             id: "resend",
-            resolve: "./modules/notification/providers/resend",
+            resolve: "./src/modules/notification/providers/resend",
             options: {
               api_key: process.env.RESEND_API_KEY,
               from: process.env.RESEND_FROM || "onboarding@resend.dev",
