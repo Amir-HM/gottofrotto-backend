@@ -31,11 +31,18 @@ module.exports = defineConfig({
     notification: {
       resolve: "@medusajs/notification",
       options: {
-        provider: {
-          id: "resend",
-          api_key: process.env.RESEND_API_KEY,
-          from: process.env.RESEND_FROM || "onboarding@resend.dev"
-        }
+        provider_id: "resend",
+        providers: [
+          {
+            id: "resend",
+            resolve: "./modules/notification/providers/resend",
+            options: {
+              api_key: process.env.RESEND_API_KEY,
+              from: process.env.RESEND_FROM || "onboarding@resend.dev",
+              channels: ["email"]
+            }
+          }
+        ]
       }
     }
     // Add more modules as needed, in the same object form!
