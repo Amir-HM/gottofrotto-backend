@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "ES2021",
     "esModuleInterop": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
