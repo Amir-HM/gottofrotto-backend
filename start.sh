@@ -25,5 +25,4 @@ if [ ! -d "$BUILD_DIR" ]; then
   echo "❌ Build output not found at $BUILD_DIR"
   exit 1
 fi
-cd "$BUILD_DIR"
 exec medusa start --host 0.0.0.0 --port ${PORT:-9000}
