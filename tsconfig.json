@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "ES2021",
     "esModuleInterop": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
@@ -28,7 +28,8 @@
     "swc": true
   },
   "include": [
-    "**/*",
+    "src/**/*",
+    "medusa-config.ts",
     ".medusa/types/*"
   ],
   "exclude": [
