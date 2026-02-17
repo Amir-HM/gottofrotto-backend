@@ -18,6 +18,7 @@
     "create-admin": "npx medusa exec ./scripts/create-admin.js --",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "start": "./start.sh",
+    "start:prod": "medusa start --host 0.0.0.0 --port ${PORT:-9000}",
     "dev": "medusa develop",
     "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
     "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
