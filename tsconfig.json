@@ -29,7 +29,7 @@
   },
   "include": [
     "src/**/*",
-    "medusa-config.ts",
+    "medusa-config.mjs",
     ".medusa/types/*"
   ],
   "exclude": [

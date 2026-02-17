@@ -105,15 +105,15 @@ export default class ResendNotificationProviderService extends AbstractNotificat
       )
     }
 
-    try {
-      const payload: any = {
-        from,
-        to: [notification.to],
-        subject,
-        html: html ?? undefined,
-        text: text ?? undefined,
-      }
+    const payload: any = {
+      from,
+      to: [notification.to],
+      subject,
+      html: html ?? undefined,
+      text: text ?? undefined,
+    }
 
+    try {
       const { data, error } = await this.client_.emails.send(payload)
 
       if (error) {
@@ -127,10 +127,11 @@ export default class ResendNotificationProviderService extends AbstractNotificat
         )
       }
 
-      return {
-        id: data?.id,
-      }
+      return { id: data?.id }
     } catch (err) {
+      if (err instanceof MedusaError) {
+        throw err
+      }
       const error = err as Error
       this.logger_.error?.(
         "[notification][resend] Unexpected error while sending email",

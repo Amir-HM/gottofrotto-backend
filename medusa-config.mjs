@@ -13,7 +13,7 @@ export default defineConfig({
     databaseDriverOptions: process.env.NODE_ENV === "production"
       ? {
           connection: {
-            ssl: { rejectUnauthorized: false }
+            ssl: { rejectUnauthorized: true }
           }
         }
       : {},
@@ -21,15 +21,14 @@ export default defineConfig({
       storeCors: process.env.STORE_CORS,
       adminCors: process.env.ADMIN_CORS,
       authCors: process.env.AUTH_CORS,
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret"
+      jwtSecret: process.env.JWT_SECRET || (process.env.NODE_ENV !== "production" ? "supersecret" : undefined),
+      cookieSecret: process.env.COOKIE_SECRET || (process.env.NODE_ENV !== "production" ? "supersecret" : undefined)
     }
   },
   modules: {
     notification: {
       resolve: "@medusajs/notification",
       options: {
-        provider_id: "resend",
         providers: [
           {
             id: "resend",
