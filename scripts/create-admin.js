@@ -1,8 +1,7 @@
-// Create an admin user via Medusa v2 CLI
-// Usage: npx medusa user -e admin@example.com -p password123
+// Create an admin user via Medusa v2 API
+// Usage: ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=pass123 npx medusa exec ./scripts/create-admin.js
 //
-// This script is kept as a convenience wrapper.
-// It uses Medusa v2's built-in user management workflows.
+// This follows the same pattern as the built-in `medusa user` CLI command.
 
 module.exports = async ({ container }) => {
   const logger = container.resolve("logger")
@@ -20,20 +19,30 @@ module.exports = async ({ container }) => {
   logger.info(`Creating admin user ${email}...`)
 
   try {
-    const { createUserAccountWorkflow } = await import(
-      "@medusajs/medusa/core-flows"
-    )
+    const { Modules } = await import("@medusajs/framework/utils")
 
-    const { result } = await createUserAccountWorkflow(container).run({
-      input: {
-        authIdentityId: undefined,
-        userData: {
-          email,
-        },
+    const userService = container.resolve(Modules.USER)
+    const authService = container.resolve(Modules.AUTH)
+
+    const user = await userService.createUsers({ email })
+
+    const { authIdentity, error } = await authService.register("emailpass", {
+      body: { email, password },
+    })
+
+    if (error) {
+      logger.error(error)
+      process.exit(1)
+    }
+
+    await authService.updateAuthIdentities({
+      id: authIdentity.id,
+      app_metadata: {
+        user_id: user.id,
       },
     })
 
-    logger.info(`Admin user created: ${result.id}`)
+    logger.info(`Admin user created: ${user.id}`)
   } catch (err) {
     if (err.message?.includes("already exists") || err.message?.includes("duplicate")) {
       logger.info(`User ${email} already exists.`)

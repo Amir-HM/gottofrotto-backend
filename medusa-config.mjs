@@ -3,6 +3,9 @@ import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
 export default defineConfig({
+  featureFlags: {
+    backend_hmr: process.env.NODE_ENV !== "production",
+  },
   admin: {
     path: "/app",
     disable: false
