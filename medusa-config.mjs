@@ -10,7 +10,7 @@ export default defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     redisUrl: process.env.REDIS_URL,
-    databaseDriverOptions: process.env.NODE_ENV === "production"
+    databaseDriverOptions: process.env.DATABASE_URL?.includes("sslmode=require")
       ? {
           connection: {
             ssl: { rejectUnauthorized: true }
