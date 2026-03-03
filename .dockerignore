@@ -1,0 +1,13 @@
+node_modules
+.medusa
+.cache
+.git
+.env
+.env.*
+!.env.template
+!.env.production.example
+deploy
+integration-tests
+*.md
+.vscode
+.context
