@@ -51,43 +51,49 @@ export default async function sendPasswordResetEmail({
     "<p>This link expires in 15 minutes. If you didn’t request the reset you can ignore this email.</p>",
   ].join("")
 
-  const notifications = await notificationService.createNotifications({
-    to: recipient,
-    channel: DEFAULT_CHANNEL,
-    template: DEFAULT_TEMPLATE,
-    trigger_type: AuthWorkflowEvents.PASSWORD_RESET,
-    data: {
-      actor_type,
-      reset_url: resetUrl,
-      token,
-    },
-    content: {
-      subject,
-      text,
-      html,
-    },
-  })
-
-  const normalized = Array.isArray(notifications)
-    ? notifications
-    : [notifications as NotificationTypes.NotificationDTO]
-
-  const failed = normalized.filter(
-    (notification) => notification.status !== "success"
-  )
-
-  if (failed.length) {
-    logger?.error?.(
-      "[notification][resend] Failed to dispatch password reset email",
-      failed
-    )
-  } else {
-    logger?.info?.(
-      "[notification][resend] Password reset email queued successfully",
-      {
-        to: recipient,
+  try {
+    const notifications = await notificationService.createNotifications({
+      to: recipient,
+      channel: DEFAULT_CHANNEL,
+      template: DEFAULT_TEMPLATE,
+      trigger_type: AuthWorkflowEvents.PASSWORD_RESET,
+      data: {
         actor_type,
-      }
+        reset_url: resetUrl,
+      },
+      content: {
+        subject,
+        text,
+        html,
+      },
+    })
+
+    const normalized = Array.isArray(notifications)
+      ? notifications
+      : [notifications as NotificationTypes.NotificationDTO]
+
+    const failed = normalized.filter(
+      (notification) => notification.status !== "success"
+    )
+
+    if (failed.length) {
+      logger?.error?.(
+        "[notification][resend] Failed to dispatch password reset email",
+        failed
+      )
+    } else {
+      logger?.info?.(
+        "[notification][resend] Password reset email queued successfully",
+        {
+          to: recipient,
+          actor_type,
+        }
+      )
+    }
+  } catch (err) {
+    logger?.error?.(
+      "[notification][resend] Unhandled error sending password reset email",
+      err
     )
   }
 }
@@ -126,14 +132,15 @@ const buildResetPasswordUrl = (
   const configModule = safeResolve(container, "configModule") ?? {}
   const adminPath = (configModule.admin?.path as string) ?? "/app"
 
+  // Only use explicit, intentional URL env vars for the reset link base.
+  // Mining the CORS allowlist for an origin used to leak localhost/wildcards
+  // into production emails.
   const baseCandidates = [
     process.env.ADMIN_RESET_PASSWORD_URL,
     process.env.ADMIN_PUBLIC_URL,
     process.env.ADMIN_BASE_URL,
     process.env.BACKEND_URL,
     process.env.MEDUSA_BACKEND_URL,
-    pickFirstOrigin(process.env.ADMIN_CORS),
-    pickFirstOrigin(configModule.projectConfig?.http?.adminCors),
   ].filter(Boolean) as string[]
 
   const resetPath = normalizePath(`${adminPath}/reset-password`)

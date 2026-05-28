@@ -16,6 +16,7 @@ if [ -f "public/admin/index.html" ]; then
 else
     echo "❌ Admin UI build failed - index.html not found"
     ls -la public/ 2>/dev/null || echo "No public directory"
+    exit 1
 fi
 
 # Run database migrations

@@ -21,6 +21,11 @@ import {
 } from "@medusajs/medusa/core-flows";
 
 export default async function seedDemoData({ container }: ExecArgs) {
+  if (process.env.NODE_ENV === "production" && !process.env.ALLOW_PROD_SEED) {
+    throw new Error(
+      "Refusing to run the demo seed in production. Set ALLOW_PROD_SEED=1 to override (this will overwrite inventory)."
+    );
+  }
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
   const link = container.resolve(ContainerRegistrationKeys.LINK);
   const query = container.resolve(ContainerRegistrationKeys.QUERY);
