@@ -16,9 +16,8 @@
     "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
     "checkJs": false,
-    "strictNullChecks": true
+    "strict": true
   },
   "ts-node": {
     "swc": true

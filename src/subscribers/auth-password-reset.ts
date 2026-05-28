@@ -2,8 +2,21 @@ import type {
   SubscriberArgs,
   SubscriberConfig,
 } from "@medusajs/framework"
-import type { NotificationTypes } from "@medusajs/types"
+import type { MedusaContainer, NotificationTypes } from "@medusajs/types"
 import { AuthWorkflowEvents } from "@medusajs/framework/utils"
+
+type LoggerLike = {
+  debug?: (...args: unknown[]) => void
+  info?: (...args: unknown[]) => void
+  warn?: (...args: unknown[]) => void
+  error?: (...args: unknown[]) => void
+}
+
+type NotificationServiceLike = {
+  createNotifications: (
+    payload: Parameters<NotificationTypes.INotificationModuleService["createNotifications"]>[0]
+  ) => Promise<NotificationTypes.NotificationDTO | NotificationTypes.NotificationDTO[]>
+}
 
 type PasswordResetEvent = {
   entity_id: string
@@ -102,11 +115,14 @@ export const config: SubscriberConfig = {
   event: AuthWorkflowEvents.PASSWORD_RESET,
 }
 
-const resolveNotificationService = (container: any, logger?: LoggerType) => {
+const resolveNotificationService = (
+  container: MedusaContainer,
+  logger?: LoggerLike
+): NotificationServiceLike | null => {
   const candidates = ["notification", "notificationModuleService"]
   for (const key of candidates) {
     try {
-      return container.resolve(key)
+      return container.resolve(key) as NotificationServiceLike
     } catch (error) {
       logger?.debug?.(
         `[notification][resend] Unable to resolve container key "${key}": ${(error as Error).message}`
@@ -116,21 +132,26 @@ const resolveNotificationService = (container: any, logger?: LoggerType) => {
   return null
 }
 
-const resolveLogger = (container: any): LoggerType | undefined => {
+const resolveLogger = (container: MedusaContainer): LoggerLike => {
   try {
-    return container.resolve("logger")
+    return container.resolve("logger") as LoggerLike
   } catch {
     return console
   }
 }
 
+type ConfigModuleLike = {
+  admin?: { path?: string }
+  projectConfig?: { http?: { adminCors?: string } }
+}
+
 const buildResetPasswordUrl = (
-  container: any,
+  container: MedusaContainer,
   token: string,
   actorType: string
 ) => {
-  const configModule = safeResolve(container, "configModule") ?? {}
-  const adminPath = (configModule.admin?.path as string) ?? "/app"
+  const configModule = safeResolve<ConfigModuleLike>(container, "configModule") ?? {}
+  const adminPath = configModule.admin?.path ?? "/app"
 
   // Only use explicit, intentional URL env vars for the reset link base.
   // Mining the CORS allowlist for an origin used to leak localhost/wildcards
@@ -207,17 +228,10 @@ const pickFirstOrigin = (value?: string) => {
   return value.split(",")[0]?.trim()
 }
 
-const safeResolve = (container: any, key: string) => {
+const safeResolve = <T>(container: MedusaContainer, key: string): T | undefined => {
   try {
-    return container.resolve(key)
+    return container.resolve(key) as T
   } catch {
     return undefined
   }
-}
-
-type LoggerType = {
-  debug?: (...args: any[]) => void
-  info?: (...args: any[]) => void
-  warn?: (...args: any[]) => void
-  error?: (...args: any[]) => void
 }

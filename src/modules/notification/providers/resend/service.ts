@@ -106,12 +106,11 @@ export default class ResendNotificationProviderService extends AbstractNotificat
     }
 
     try {
-      const payload: any = {
+      const payload: Parameters<typeof this.client_.emails.send>[0] = {
         from,
         to: [notification.to],
         subject,
-        html: html ?? undefined,
-        text: text ?? undefined,
+        ...(html ? { html } : { text: text! }),
       }
 
       const { data, error } = await this.client_.emails.send(payload)
