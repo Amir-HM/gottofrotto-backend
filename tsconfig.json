@@ -17,10 +17,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "paths": {
-      "@medusajs/framework/*": ["node_modules/@medusajs/framework/dist/*"],
-      "@medusajs/medusa/*": ["node_modules/@medusajs/medusa/dist/*"]
-    },
     "checkJs": false,
     "strictNullChecks": true
   },

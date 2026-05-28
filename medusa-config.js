@@ -28,23 +28,26 @@ module.exports = defineConfig({
     }
   },
   modules: {
-    notification: {
-      resolve: "@medusajs/notification",
-      options: {
-        provider_id: "resend",
-        providers: [
-          {
-            id: "resend",
-            resolve: "./src/modules/notification/providers/resend",
+    ...(process.env.RESEND_API_KEY
+      ? {
+          notification: {
+            resolve: "@medusajs/notification",
             options: {
-              api_key: process.env.RESEND_API_KEY,
-              from: process.env.RESEND_FROM || "onboarding@resend.dev",
-              channels: ["email"]
+              provider_id: "resend",
+              providers: [
+                {
+                  id: "resend",
+                  resolve: "./src/modules/notification/providers/resend",
+                  options: {
+                    api_key: process.env.RESEND_API_KEY,
+                    from: process.env.RESEND_FROM || "onboarding@resend.dev",
+                    channels: ["email"]
+                  }
+                }
+              ]
             }
           }
-        ]
-      }
-    }
-    // Add more modules as needed, in the same object form!
+        }
+      : {})
   }
 });

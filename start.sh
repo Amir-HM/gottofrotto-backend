@@ -18,7 +18,11 @@ else
     ls -la public/ 2>/dev/null || echo "No public directory"
 fi
 
-# Start server (migrations already completed)
+# Run database migrations
+echo "Running database migrations..."
+npx medusa db:migrate
+
+# Start server
 echo "Starting Medusa API server..."
 BUILD_DIR=".medusa/server"
 if [ ! -d "$BUILD_DIR" ]; then
