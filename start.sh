@@ -1,33 +1,30 @@
 #!/bin/bash
 set -e
 
+# Start script only — the build is already done by Railway's build phase
+# (npm install + npm run build) before the runtime container starts.
+# This script just verifies the build output, runs migrations, then exec's
+# the server. Keeps build noise out of the runtime log stream.
+
 echo "=== Starting Gottofrotto Backend API ==="
 echo "NODE_ENV: ${NODE_ENV:-development}"
 echo "PORT: ${PORT:-9000}"
 
-# Build application with admin UI (includes symbolic link creation)
-echo "Building application (backend + admin UI)..."
-NODE_OPTIONS='--max-old-space-size=1536' npm run build
-
-# Verify admin files are accessible
-echo "Verifying admin build..."
-if [ -f "public/admin/index.html" ]; then
-    echo "✅ Admin UI build successful - index.html found at public/admin/index.html"
-else
-    echo "❌ Admin UI build failed - index.html not found"
-    ls -la public/ 2>/dev/null || echo "No public directory"
-    exit 1
+BUILD_DIR=".medusa/server"
+if [ ! -d "$BUILD_DIR" ]; then
+  echo "❌ Build output not found at $BUILD_DIR — did the build phase fail?"
+  exit 1
 fi
 
-# Run database migrations
+if [ ! -f "public/admin/index.html" ]; then
+  echo "❌ Admin UI build missing (public/admin/index.html)"
+  ls -la public/ 2>/dev/null || echo "  no public/ directory"
+  exit 1
+fi
+echo "✅ Build output present"
+
 echo "Running database migrations..."
 npx medusa db:migrate
 
-# Start server
 echo "Starting Medusa API server..."
-BUILD_DIR=".medusa/server"
-if [ ! -d "$BUILD_DIR" ]; then
-  echo "❌ Build output not found at $BUILD_DIR"
-  exit 1
-fi
 exec medusa start --host 0.0.0.0 --port ${PORT:-9000}
