@@ -41,11 +41,14 @@ module.exports = defineConfig({
     databaseDriverOptions: isProduction
       ? {
           connection: {
-            // Railway/Neon managed Postgres terminates TLS at the proxy with
-            // a cert chain that the pg client can't verify. This is the
-            // documented approach for Railway internal Postgres — the
-            // connection is still encrypted; only the cert chain is not
-            // validated. Replace with a CA cert if/when one is available.
+            // Accepted security finding — DO NOT change without a Railway CA cert in hand.
+            // Railway's internal Postgres is reached over the private *.railway.internal
+            // mesh and uses a self-signed cert that no public CA chain can verify.
+            // Setting rejectUnauthorized: true here would break the connection entirely.
+            // The connection is still TLS-encrypted; only chain verification is skipped,
+            // and traffic never leaves Railway's private network. This is the documented
+            // pattern for Railway-managed Postgres. Re-evaluate only if Railway ships a
+            // public internal CA, or if this app moves off Railway-internal Postgres.
             ssl: { rejectUnauthorized: false }
           }
         }
