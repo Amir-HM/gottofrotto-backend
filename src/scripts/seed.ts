@@ -338,13 +338,29 @@ export default async function seedDemoData({ container }: ExecArgs) {
     },
   });
 
+  // Look up a seeded category by name and throw a useful error if a future
+  // edit renames a category in one place but forgets the call sites. Without
+  // this, `find(...)!.id` would crash with the unhelpful
+  // "Cannot read properties of undefined (reading 'id')" — telling you
+  // nothing about which category was missing.
+  const requireCategoryId = (name: string): string => {
+    const match = categoryResult.find((cat) => cat.name === name);
+    if (!match) {
+      const available = categoryResult.map((c) => c.name).join(", ");
+      throw new Error(
+        `Seed: category "${name}" was not created. Available: [${available}]`
+      );
+    }
+    return match.id;
+  };
+
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
           title: "Medusa T-Shirt",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Shirts")!.id,
+            requireCategoryId("Shirts"),
           ],
           description:
             "Reimagine the feeling of a classic T-shirt. With our cotton T-shirts, everyday essentials no longer have to be ordinary.",
@@ -531,7 +547,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         {
           title: "Medusa Sweatshirt",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Sweatshirts")!.id,
+            requireCategoryId("Sweatshirts"),
           ],
           description:
             "Reimagine the feeling of a classic sweatshirt. With our cotton sweatshirt, everyday essentials no longer have to be ordinary.",
@@ -632,7 +648,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         {
           title: "Medusa Sweatpants",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Pants")!.id,
+            requireCategoryId("Pants"),
           ],
           description:
             "Reimagine the feeling of classic sweatpants. With our cotton sweatpants, everyday essentials no longer have to be ordinary.",
@@ -733,7 +749,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         {
           title: "Medusa Shorts",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Merch")!.id,
+            requireCategoryId("Merch"),
           ],
           description:
             "Reimagine the feeling of classic shorts. With our cotton shorts, everyday essentials no longer have to be ordinary.",
