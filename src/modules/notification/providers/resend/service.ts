@@ -83,19 +83,15 @@ export default class ResendNotificationProviderService extends AbstractNotificat
       )
     }
 
-    const subject =
-      notification.content?.subject ||
-      (notification.data?.subject as string) ||
-      "Notification"
-
-    const html =
-      notification.content?.html ||
-      (notification.data?.html as string) ||
-      undefined
-
+    // Only accept content from the typed `notification.content` envelope.
+    // The `notification.data` bag is caller-controlled and could contain
+    // attacker-supplied HTML if a future subscriber forwards user input.
+    // Restricting source here closes that XSS-via-email channel at the
+    // boundary instead of relying on every caller to do the right thing.
+    const subject = notification.content?.subject || "Notification"
+    const html = notification.content?.html || undefined
     const text =
       notification.content?.text ||
-      (notification.data?.text as string) ||
       (html ? stripHtml(html) : undefined)
 
     if (!html && !text) {
@@ -110,10 +106,21 @@ export default class ResendNotificationProviderService extends AbstractNotificat
         from,
         to: [notification.to],
         subject,
+        // Invariant: the `!html && !text` guard above guarantees `text` is
+        // defined here when `html` is not. The non-null assertion is the
+        // narrowest way to communicate that to the compiler.
         ...(html ? { html } : { text: text! }),
       }
 
-      const { data, error } = await this.client_.emails.send(payload)
+      // Cap the Resend round-trip so an outage doesn't pin a Node socket
+      // for two minutes (Node's default). 10s is generous for transactional
+      // email and aligns with how long we're willing to hold the password-
+      // reset event-bus slot.
+      const { data, error } = await withTimeout(
+        this.client_.emails.send(payload),
+        10_000,
+        "resend"
+      )
 
       if (error) {
         this.logger_.error?.(
@@ -145,3 +152,24 @@ export default class ResendNotificationProviderService extends AbstractNotificat
 
 const stripHtml = (value: string) =>
   value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()
+
+const withTimeout = <T>(
+  promise: Promise<T>,
+  ms: number,
+  label: string
+): Promise<T> => {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`${label} request timed out after ${ms}ms`))
+    }, ms)
+    promise
+      .then((value) => {
+        clearTimeout(timer)
+        resolve(value)
+      })
+      .catch((err) => {
+        clearTimeout(timer)
+        reject(err)
+      })
+  })
+}

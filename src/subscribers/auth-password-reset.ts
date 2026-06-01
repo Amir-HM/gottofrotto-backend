@@ -220,14 +220,6 @@ const ensureHttps = (value?: string) => {
   return `https://${value}`
 }
 
-const pickFirstOrigin = (value?: string) => {
-  if (!value) {
-    return undefined
-  }
-
-  return value.split(",")[0]?.trim()
-}
-
 const safeResolve = <T>(container: MedusaContainer, key: string): T | undefined => {
   try {
     return container.resolve(key) as T

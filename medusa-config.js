@@ -50,7 +50,11 @@ module.exports = defineConfig({
             // pattern for Railway-managed Postgres. Re-evaluate only if Railway ships a
             // public internal CA, or if this app moves off Railway-internal Postgres.
             ssl: { rejectUnauthorized: false }
-          }
+          },
+          // Cap the knex pool for Railway's 1 vCPU box. Default max:10 is too
+          // generous — under bursty load it can saturate Postgres' connection
+          // limit before saturating CPU. min:1 avoids idle-connection cost.
+          pool: { min: 1, max: 5 }
         }
       : {},
     http: {

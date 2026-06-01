@@ -5,9 +5,6 @@
 //
 // Or via env vars (works when medusa exec swallows positional args):
 //   ADMIN_EMAIL=... ADMIN_PASSWORD=... npx medusa exec ./scripts/create-admin.js
-//
-// Equivalent to the built-in `npx medusa user -e ... -p ...` command but kept
-// here so deployment runbooks have a stable script path.
 
 const { Modules } = require("@medusajs/framework/utils")
 
@@ -28,8 +25,10 @@ module.exports = async function createAdmin({ container, args }) {
   const logger = container.resolve("logger")
 
   const cli = parseArgs(args || [])
-  const email = cli.email || process.env.ADMIN_EMAIL || process.env.EMAIL
-  const password = cli.password || process.env.ADMIN_PASSWORD || process.env.PASSWORD
+  // Only accept namespaced env vars. Generic PASSWORD / EMAIL fallbacks
+  // were removed because they collide with unrelated env on Railway/CI.
+  const email = cli.email || process.env.ADMIN_EMAIL
+  const password = cli.password || process.env.ADMIN_PASSWORD
 
   if (!email || !password) {
     logger.error(
@@ -47,19 +46,21 @@ module.exports = async function createAdmin({ container, args }) {
     return
   }
 
-  // Create the auth identity first. The emailpass provider hashes the password
-  // when stored in provider_metadata.
-  const authIdentities = await authModule.createAuthIdentities([
-    {
-      provider_identities: [
-        {
-          provider: "emailpass",
-          entity_id: email,
-          provider_metadata: { password },
-        },
-      ],
-    },
-  ])
+  // Use the auth module's `register` flow so the emailpass provider's
+  // `hashPassword` (scrypt-kdf) runs against the raw password. Calling
+  // `createAuthIdentities` directly would skip the provider hook and
+  // persist plaintext into provider_metadata — verified by reading
+  // node_modules/@medusajs/auth-emailpass/dist/services/emailpass.js.
+  const result = await authModule.register("emailpass", {
+    body: { email, password },
+  })
+
+  if (!result.success || !result.authIdentity) {
+    logger.error(
+      `Failed to register auth identity for ${email}: ${result.error || "unknown error"}`
+    )
+    process.exit(1)
+  }
 
   const users = await userModule.createUsers([{ email }])
 
@@ -68,7 +69,7 @@ module.exports = async function createAdmin({ container, args }) {
   const remoteLink = container.resolve("remoteLink")
   await remoteLink.create([
     {
-      [Modules.AUTH]: { auth_identity_id: authIdentities[0].id },
+      [Modules.AUTH]: { auth_identity_id: result.authIdentity.id },
       [Modules.USER]: { user_id: users[0].id },
     },
   ])
