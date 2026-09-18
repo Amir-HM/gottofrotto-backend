@@ -1,0 +1,22 @@
+{
+  "enabledPlugins": {
+    "openseo@openseo": true,
+    "medusa-dev@medusa": true,
+    "ecommerce-storefront@medusa": true,
+    "learn-medusa@medusa": true
+  },
+  "extraKnownMarketplaces": {
+    "openseo": {
+      "source": {
+        "source": "github",
+        "repo": "every-app/open-seo"
+      }
+    },
+    "medusa": {
+      "source": {
+        "source": "github",
+        "repo": "medusajs/medusa-agent-skills"
+      }
+    }
+  }
+}
