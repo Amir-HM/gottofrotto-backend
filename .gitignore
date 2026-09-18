@@ -26,3 +26,5 @@ build
 !.yarn/versions
 
 .medusa
+# Build symlink created by `npm run build` (-> .medusa/server/public)
+public

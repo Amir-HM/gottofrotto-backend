@@ -1,12 +1,16 @@
-// Create (or update) a Medusa admin user from a script-runnable command.
+// Create a Medusa admin user from a script-runnable command.
 //
 // Usage (inside the container or via `railway ssh`):
 //   npx medusa exec ./scripts/create-admin.js -- -e admin@example.com -p YourSecret
 //
 // Or via env vars (works when medusa exec swallows positional args):
 //   ADMIN_EMAIL=... ADMIN_PASSWORD=... npx medusa exec ./scripts/create-admin.js
+//
+// Medusa ships an equivalent `medusa user -e <email> -p <password>` command.
+// This script stays because it is idempotent (no-ops on an existing user)
+// and reads env vars, which the built-in command does not.
 
-const { Modules } = require("@medusajs/framework/utils")
+const { ContainerRegistrationKeys, FeatureFlag, Modules } = require("@medusajs/framework/utils")
 
 const parseArgs = (rest) => {
   const out = {}
@@ -21,8 +25,8 @@ const parseArgs = (rest) => {
   return out
 }
 
-module.exports = async function createAdmin({ container, args }) {
-  const logger = container.resolve("logger")
+async function createAdmin({ container, args }) {
+  const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
   const cli = parseArgs(args || [])
   // Only accept namespaced env vars. Generic PASSWORD / EMAIL fallbacks
@@ -39,6 +43,7 @@ module.exports = async function createAdmin({ container, args }) {
 
   const userModule = container.resolve(Modules.USER)
   const authModule = container.resolve(Modules.AUTH)
+  const workflowEngine = container.resolve(Modules.WORKFLOW_ENGINE)
 
   const existingUsers = await userModule.listUsers({ email })
   if (existingUsers.length > 0) {
@@ -46,33 +51,49 @@ module.exports = async function createAdmin({ container, args }) {
     return
   }
 
+  // Mirror the built-in `medusa user` command: when the rbac feature flag is
+  // on, a user created without the super-admin role can sign in but sees
+  // nothing, which looks like a broken account.
+  let userRoles = []
+  if (FeatureFlag.isFeatureEnabled("rbac")) {
+    const rbacService = container.resolve(Modules.RBAC)
+    const superAdminRoles = await rbacService.listRbacRoles({ id: "role_super_admin" })
+    if (superAdminRoles.length > 0) {
+      userRoles = [superAdminRoles[0].id]
+    }
+  }
+
+  const { result: users } = await workflowEngine.run("create-users-workflow", {
+    input: { users: [{ email, roles: userRoles }] },
+  })
+  const user = users[0]
+
   // Use the auth module's `register` flow so the emailpass provider's
   // `hashPassword` (scrypt-kdf) runs against the raw password. Calling
   // `createAuthIdentities` directly would skip the provider hook and
-  // persist plaintext into provider_metadata — verified by reading
-  // node_modules/@medusajs/auth-emailpass/dist/services/emailpass.js.
-  const result = await authModule.register("emailpass", {
+  // persist plaintext into provider_metadata.
+  const { authIdentity, error } = await authModule.register("emailpass", {
     body: { email, password },
   })
 
-  if (!result.success || !result.authIdentity) {
-    logger.error(
-      `Failed to register auth identity for ${email}: ${result.error || "unknown error"}`
-    )
+  if (error || !authIdentity) {
+    logger.error(`Failed to register auth identity for ${email}: ${error || "unknown error"}`)
     process.exit(1)
   }
 
-  const users = await userModule.createUsers([{ email }])
+  // Medusa 2.19+ resolves the admin user from the auth identity's
+  // `app_metadata.user_id`. The old `remoteLink.create()` pairing of
+  // auth_identity_id <-> user_id no longer has a registered link module
+  // and throws at runtime.
+  await authModule.updateAuthIdentities({
+    id: authIdentity.id,
+    app_metadata: { user_id: user.id },
+  })
 
-  // Link the user record to the auth identity so the login flow can resolve
-  // one from the other.
-  const remoteLink = container.resolve("remoteLink")
-  await remoteLink.create([
-    {
-      [Modules.AUTH]: { auth_identity_id: result.authIdentity.id },
-      [Modules.USER]: { user_id: users[0].id },
-    },
-  ])
-
-  logger.info(`Admin user created: ${email} (id=${users[0].id})`)
+  logger.info(
+    `Admin user created: ${email} (id=${user.id})` +
+      (userRoles.length > 0 ? " — super admin role assigned." : "")
+  )
 }
+
+exports.default = createAdmin
